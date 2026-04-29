@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid()) @db.Uuid
+  email         String         @unique
+  name          String
+  passwordHash  String         @map("password_hash")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  refreshTokens RefreshToken[]
+  studySessions StudySession[]
+  subjects      Subject[]
+  calendarEvents CalendarEvent[]
+  studySetting  StudySetting?
+  kanbanBoard   KanbanBoard?
+
+  @@index([email])
+  @@map("users")
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  tokenHash  String   @unique @map("token_hash")
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model StudySession {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  subject         String
+  topic           String   @default("")
+  startTime       String   @default("") @map("start_time")
+  endTime         String   @default("") @map("end_time")
+  durationMinutes Int      @map("duration_minutes")
+  sessionDate     DateTime @map("session_date") @db.Date
+  notes           String   @default("")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sessionDate(sort: Desc), createdAt(sort: Desc)])
+  @@index([userId, subject])
+  @@map("study_sessions")
+}
+
+model Subject {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  subject   String
+  color     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subject])
+  @@index([userId, subject])
+  @@map("subjects")
+}
+
+model CalendarEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  title     String
+  subject   String?
+  eventDate DateTime @map("event_date") @db.Date
+  startTime String?  @map("start_time")
+  endTime   String?  @map("end_time")
+  allDay    Boolean  @map("all_day")
+  color     String?
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, eventDate, startTime])
+  @@index([userId, subject])
+  @@map("calendar_events")
+}
+
+model StudySetting {
+  userId             String   @id @map("user_id") @db.Uuid
+  dailyTargetMinutes Int      @map("daily_target_minutes")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("study_settings")
+}
+
+model KanbanBoard {
+  userId    String   @id @map("user_id") @db.Uuid
+  board     Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("kanban_boards")
+}
