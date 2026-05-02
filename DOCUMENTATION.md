@@ -50,6 +50,35 @@ Default server port is controlled by `PORT` (`3000` if not set).
 
 ---
 
+## Docker Compose (local development)
+
+From repo root (`study-tracker`):
+
+1. Copy compose env template:
+   - `.env.compose.example` → `.env`
+2. Start services:
+   - `docker compose up --build`
+3. Stop services:
+   - `docker compose down`
+
+Services started by compose:
+
+- `postgres` (`postgres:16`) with persistent volume `postgres_data`
+- `api` (Node 20) built from `api/Dockerfile`
+
+Compose startup behavior for API:
+
+- waits for Postgres health check
+- runs `pnpm prisma:generate`
+- runs `pnpm prisma:push`
+- starts server via `pnpm start`
+
+To reset DB data completely (destructive):
+
+- `docker compose down -v`
+
+---
+
 ## Health and API docs
 
 - Health check: `GET /health`
