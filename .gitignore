@@ -12,6 +12,10 @@ coverage
 pnpm-debug.log*
 npm-debug.log*
 
+# Lockfile policy (pnpm only)
+package-lock.json
+npm-shrinkwrap.json
+
 # OS / editor
 .DS_Store
 .vscode/
