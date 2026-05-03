@@ -14,4 +14,4 @@ RUN pnpm build
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "pnpm prisma:generate && pnpm prisma:push && pnpm start"]
+CMD ["sh", "-c", "pnpm prisma:generate && pnpm start"]
