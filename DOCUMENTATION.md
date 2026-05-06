@@ -50,32 +50,43 @@ Default server port is controlled by `PORT` (`3000` if not set).
 
 ---
 
-## Docker Compose (local development)
+## Docker Compose (API only)
 
-From repo root (`study-tracker`):
+The compose file in this folder starts only the `api` service.
+Database is not containerized: the API connects directly to your external Supabase PostgreSQL via `DATABASE_URL`.
+
+### 1) Prepare environment variables
 
 1. Copy compose env template:
-   - `.env.compose.example` → `.env`
-2. Start services:
-   - `docker compose up --build`
-3. Stop services:
-   - `docker compose down`
+   - `.env.compose.example` -> `.env`
+2. Set values in `.env`:
+   - `DATABASE_URL` (Supabase connection string)
+   - `JWT_SECRET`
+   - `CORS_ORIGINS` (comma-separated frontend origins)
 
-Services started by compose:
+Compose mapping is fixed to:
 
-- `postgres` (`postgres:16`) with persistent volume `postgres_data`
-- `api` (Node 20) built from `api/Dockerfile`
+- host `3003` -> container `3000`
 
-Compose startup behavior for API:
+### 2) Build and start the API container
 
-- waits for Postgres health check
-- runs `pnpm prisma:generate`
-- runs `pnpm prisma:push`
-- starts server via `pnpm start`
+```bash
+docker compose up -d --build
+```
 
-To reset DB data completely (destructive):
+### 3) Verify container health
 
-- `docker compose down -v`
+```bash
+curl http://localhost:3003/health
+```
+
+### 4) Optional Prisma schema push
+
+If you need to apply schema changes to Supabase manually:
+
+```bash
+docker compose run --rm api pnpm prisma:push
+```
 
 ---
 

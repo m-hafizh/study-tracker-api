@@ -1,16 +1,24 @@
 services:
-  api:
+  app:
+    container_name: study-tracker-api
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: study-tracker-api
-    restart: unless-stopped
+    env_file:
+      - .env
     environment:
       NODE_ENV: production
-      PORT: ${PORT:-3000}
-      DATABASE_URL: ${DATABASE_URL}
-      JWT_SECRET: ${JWT_SECRET:-change-this-to-a-very-long-secret}
-      ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL:-15m}
-      REFRESH_TOKEN_TTL_DAYS: ${REFRESH_TOKEN_TTL_DAYS:-30}
+      PORT: "3000"
     ports:
-      - "3000:${PORT:-3000}"
+      - "3003:3000"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/health').then((res) => { if (!res.ok) process.exit(1); }).catch(() => process.exit(1));"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped

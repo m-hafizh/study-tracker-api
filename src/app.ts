@@ -11,9 +11,19 @@ import { registerModules } from './modules/index.js';
 import { globalErrorHandler } from './shared/errors.js';
 
 export const buildApp = async () => {
-  const app = Fastify({ logger: true });
+  const app = Fastify({ logger: true, trustProxy: true });
 
-  await app.register(cors);
+  await app.register(cors, {
+    origin: (origin, callback) => {
+      if (!origin || env.CORS_ORIGINS.length === 0 || env.CORS_ORIGINS.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`Origin ${origin} is not allowed by CORS`), false);
+    },
+    credentials: true
+  });
   await app.register(jwt, { secret: env.JWT_SECRET });
   await app.register(swagger, {
     openapi: {
