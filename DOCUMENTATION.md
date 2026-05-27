@@ -68,7 +68,11 @@ This project is configured for **Vercel Serverless Functions** using:
 - `JWT_SECRET`
 - `ACCESS_TOKEN_TTL` (optional, defaults to `15m`)
 - `REFRESH_TOKEN_TTL_DAYS` (optional, defaults to `30`)
-- `CORS_ORIGINS`
+- `CORS_ORIGINS` (comma-separated exact origins and/or `*` wildcard patterns, without trailing slash)
+
+Example:
+
+- `CORS_ORIGINS=https://study-tracker-pj1vvp7fg-wachana-dev.vercel.app,https://study-tracker-*-wachana-dev.vercel.app`
 
 > `PORT` is not required on Vercel. The serverless runtime provides request handling.
 
@@ -96,7 +100,7 @@ Database is not containerized: the API connects directly to your external Supaba
 2. Set values in `.env`:
    - `DATABASE_URL` (Supabase connection string)
    - `JWT_SECRET`
-   - `CORS_ORIGINS` (comma-separated frontend origins)
+   - `CORS_ORIGINS` (comma-separated frontend origins; exact values and `*` wildcard patterns are supported)
 
 Compose mapping is fixed to:
 

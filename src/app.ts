@@ -8,14 +8,16 @@ import { env } from './config/env.js';
 import { registerAuthMiddleware } from './middleware/auth.js';
 import { loggingPlugin } from './middleware/logging.js';
 import { registerModules } from './modules/index.js';
+import { createCorsOriginMatcher } from './shared/cors.js';
 import { globalErrorHandler } from './shared/errors.js';
 
 export const buildApp = async () => {
   const app = Fastify({ logger: true, trustProxy: true });
+  const isOriginAllowed = createCorsOriginMatcher(env.CORS_ORIGINS);
 
   await app.register(cors, {
     origin: (origin, callback) => {
-      if (!origin || env.CORS_ORIGINS.length === 0 || env.CORS_ORIGINS.includes(origin)) {
+      if (isOriginAllowed(origin)) {
         callback(null, true);
         return;
       }
