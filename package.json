@@ -8,6 +8,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "pnpm prisma:generate && tsc -p tsconfig.json",
     "start": "node dist/src/index.js",
+    "vercel-build": "pnpm prisma:generate",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "prisma:generate": "prisma generate",

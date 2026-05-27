@@ -50,6 +50,40 @@ Default server port is controlled by `PORT` (`3000` if not set).
 
 ---
 
+## Vercel deployment (serverless)
+
+This project is configured for **Vercel Serverless Functions** using:
+
+- `api/index.ts` as the function entrypoint
+- `vercel.json` rewrites so every route is handled by Fastify
+
+### 1) Push to your Git provider and import in Vercel
+
+- Create a new Vercel project from this repository.
+
+### 2) Configure required environment variables in Vercel
+
+- `NODE_ENV=production`
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `ACCESS_TOKEN_TTL` (optional, defaults to `15m`)
+- `REFRESH_TOKEN_TTL_DAYS` (optional, defaults to `30`)
+- `CORS_ORIGINS`
+
+> `PORT` is not required on Vercel. The serverless runtime provides request handling.
+
+### 3) Deploy
+
+- Vercel runs `vercel-build` (configured as `pnpm prisma:generate`) so Prisma Client is generated for the function bundle.
+
+### Serverless notes
+
+- Do not rely on in-memory state between requests.
+- Cold starts can happen; app/bootstrap is cached per warm runtime instance.
+- Keep database connections and query volume efficient for short-lived function execution.
+
+---
+
 ## Docker Compose (API only)
 
 The compose file in this folder starts only the `api` service.
