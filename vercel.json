@@ -9,8 +9,7 @@
   },
   "headers": [
     {
-      "src": "/(.*)",
-      "dest": "/api/index",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
